@@ -33,7 +33,7 @@ export function applyMsg(s: RoomSnapshot, msg: ServerMsg): RoomSnapshot {
     case 'placing_phase':
       return {
         ...s,
-        state: 'hitster_placing',
+        state: 'classic_placing',
         placing_deadline_ms: msg.deadline_ms,
       }
     case 'only_player_added_changed':
@@ -66,7 +66,7 @@ export function applyMsg(s: RoomSnapshot, msg: ServerMsg): RoomSnapshot {
     case 'steal_started':
       return {
         ...s,
-        state: 'hitster_stealing',
+        state: 'classic_stealing',
         steal_placer_id: msg.placer_id,
         steal_deadline_ms: msg.deadline_ms,
         steal_attempted: [],
@@ -77,13 +77,13 @@ export function applyMsg(s: RoomSnapshot, msg: ServerMsg): RoomSnapshot {
       return s.steal_attempted.includes(msg.player_id)
         ? s
         : { ...s, steal_attempted: [...s.steal_attempted, msg.player_id] }
-    case 'hitster_game_started': {
+    case 'classic_game_started': {
       const counts = Object.fromEntries(
         Object.entries(msg.hands).map(([pid, h]) => [pid, h.length]),
       )
       return {
         ...s,
-        state: 'hitster_intro',
+        state: 'classic_intro',
         turn_order: msg.turn_order,
         hands: msg.hands,
         cumulative_scores: counts,
@@ -91,10 +91,10 @@ export function applyMsg(s: RoomSnapshot, msg: ServerMsg): RoomSnapshot {
         last_placement_result: null,
       }
     }
-    case 'hitster_turn_changed':
+    case 'classic_turn_changed':
       return {
         ...s,
-        state: 'hitster_listening',
+        state: 'classic_listening',
         current_turn_player_id: msg.current_turn_player_id,
         current_preview_url: msg.preview_url,
         snippet_duration_s: msg.snippet_duration_s,
@@ -108,7 +108,7 @@ export function applyMsg(s: RoomSnapshot, msg: ServerMsg): RoomSnapshot {
         hands[msg.stolen_by] = msg.stealer_new_hand
       return {
         ...s,
-        state: 'hitster_reveal',
+        state: 'classic_reveal',
         last_placement_result: msg,
         cumulative_scores: msg.card_counts,
         finished_players: msg.finished_players,

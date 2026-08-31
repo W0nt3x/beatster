@@ -3,7 +3,7 @@
 Rooms still run fully in-memory (timers and sockets stay ephemeral, by
 design — we deliberately never serialize running asyncio timers). This module
 only handles the files: whenever a room passes a safe *checkpoint* state
-(lobby, hitster_reveal, game_over) the manager writes its logical state as
+(lobby, classic_reveal, game_over) the manager writes its logical state as
 JSON to ``ROOMS_DIR/<CODE>.json``; on boot the manager loads whatever is
 there. A crash mid-turn therefore restores the previous checkpoint — at most
 the interrupted turn is lost.

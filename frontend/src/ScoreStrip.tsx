@@ -46,9 +46,9 @@ export default function ScoreStrip({
   const isBingo = state.startsWith('bingo')
   // turn order is a spoiler during the intro spinner; in bingo there is no
   // turn order at all — the strip becomes a live marks leaderboard instead
-  const isPostIntro = inGame && state !== 'hitster_intro' && !isBingo
+  const isPostIntro = inGame && state !== 'classic_intro' && !isBingo
   // ±1-card corrections only exist in classic
-  const canAdjust = inGame && state !== 'hitster_intro' && !isBingo
+  const canAdjust = inGame && state !== 'classic_intro' && !isBingo
 
   const turnIndex = new Map(turnOrder.map((id, i) => [id, i] as const))
   const finishIndex = new Map(finishedPlayers.map((id, i) => [id, i] as const))
@@ -83,7 +83,7 @@ export default function ScoreStrip({
           if (isCurrent) {
             ;(avatarStyle as Record<string, string>)['--ring-c'] =
               `color-mix(in oklab, ${color} 65%, transparent)`
-            avatarStyle.animation = 'hitster-ring-pulse 1.2s ease-in-out infinite'
+            avatarStyle.animation = 'beatster-ring-pulse 1.2s ease-in-out infinite'
           } else {
             avatarStyle.boxShadow = `0 0 10px color-mix(in oklab, ${color} 40%, transparent)`
           }

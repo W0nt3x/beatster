@@ -56,8 +56,8 @@ from .schemas import (
     GameMode,
     GameModeChanged,
     GameOver,
-    HitsterGameStarted,
-    HitsterTurnChanged,
+    ClassicGameStarted,
+    ClassicTurnChanged,
     HostChanged,
     OnlyPlayerAddedChanged,
     PlacementResult,
@@ -84,7 +84,7 @@ log = logging.getLogger(__name__)
 SNIPPET_DURATION_S = 15
 PLACING_TIMEOUT_S = 30
 STEAL_TIMEOUT_S = 12  # window for others to race-steal a missed card
-HITSTER_INTRO_DURATION_S = 4
+CLASSIC_INTRO_DURATION_S = 4
 MIN_SNIPPET_S = 5
 MAX_SNIPPET_S = 30
 MIN_PLACING_S = 5
@@ -128,7 +128,7 @@ RECENT_MEMORY = 80
 # mid-flight that the snapshot would have to encode); the manager persists on
 # every broadcast in these states and restores on boot — see persistence.py
 CHECKPOINT_STATES: frozenset[RoomState] = frozenset(
-    {"lobby", "hitster_reveal", "bingo_reveal", "game_over"}
+    {"lobby", "classic_reveal", "bingo_reveal", "game_over"}
 )
 
 # avatar identifiers are client-defined ("style:seed" / "img:file") but pass
@@ -173,8 +173,8 @@ BroadcastMessage = Union[
     OnlyPlayerAddedChanged,
     ExtraTracksTotalChanged,
     CardTargetChanged,
-    HitsterGameStarted,
-    HitsterTurnChanged,
+    ClassicGameStarted,
+    ClassicTurnChanged,
     PlacementResult,
     GameOver,
     RematchStarted,
@@ -378,7 +378,7 @@ class Room:
         is playing or they're placing) — i.e. their leaving stalls the table, so
         the disconnect is resolved immediately instead of after the grace."""
         return (
-            self.state in ("hitster_listening", "hitster_placing")
+            self.state in ("classic_listening", "classic_placing")
             and self.current_turn_player_id == player_id
         )
 
@@ -435,11 +435,11 @@ class Room:
 
     def snapshot_for(self, player_id: str) -> RoomSnapshot:
         in_round = self.state in (
-            "hitster_listening",
-            "hitster_placing",
+            "classic_listening",
+            "classic_placing",
             "bingo_answering",
         )
-        stealing = self.state == "hitster_stealing"
+        stealing = self.state == "classic_stealing"
         return RoomSnapshot(
             state=self.state,
             players=list(self.players),
@@ -472,7 +472,7 @@ class Room:
             ),
             placing_deadline_ms=(
                 self._placing_deadline_ms
-                if self.state == "hitster_placing"
+                if self.state == "classic_placing"
                 else None
             ),
             steal_placer_id=self._steal_placer_id if stealing else None,
@@ -480,7 +480,7 @@ class Room:
             steal_attempted=sorted(self._steal_attempted) if stealing else [],
             last_placement_result=(
                 self.last_placement_result
-                if self.state == "hitster_reveal"
+                if self.state == "classic_reveal"
                 else None
             ),
             game_mode=self.game_mode,
@@ -685,7 +685,7 @@ class Room:
         room.finished_players = [str(p) for p in data["finished_players"]]
         room.played_track_ids = {str(t) for t in data["played_track_ids"]}
         lpr = data["last_placement_result"]
-        if state == "hitster_reveal" and lpr is not None:
+        if state == "classic_reveal" and lpr is not None:
             room.last_placement_result = PlacementResult.model_validate(lpr)
         # bingo game state: a restored bingo_reveal sits paused (no timers
         # survive a restart) until the first human reconnects — see add_player
@@ -813,11 +813,11 @@ class Room:
         if not self.has_player(player_id):
             return
         in_game = self.state in (
-            "hitster_intro",
-            "hitster_listening",
-            "hitster_placing",
-            "hitster_stealing",
-            "hitster_reveal",
+            "classic_intro",
+            "classic_listening",
+            "classic_placing",
+            "classic_stealing",
+            "classic_reveal",
             "bingo_spin",
             "bingo_answering",
             "bingo_reveal",
@@ -847,8 +847,8 @@ class Room:
             # active player vanished mid-turn (snippet *or* placing) → resolve the
             # turn right away so the table doesn't wait on someone who's gone
             if was_active_turn and self.state in (
-                "hitster_listening",
-                "hitster_placing",
+                "classic_listening",
+                "classic_placing",
             ):
                 await self._force_resolve_active_turn()
             # bingo: never wait on someone who's gone — their missing answer no
@@ -889,8 +889,8 @@ class Room:
             await self._broadcast(HostChanged(host_id=self.host_id))
         await self._broadcast_pool_state()
         if was_active_turn and self.state in (
-            "hitster_listening",
-            "hitster_placing",
+            "classic_listening",
+            "classic_placing",
         ):
             await self._force_resolve_active_turn()
 
@@ -1243,17 +1243,17 @@ class Room:
         if self.game_mode == "bingo" or self.state.startswith("bingo"):
             await self._bingo_start_or_advance()
         else:
-            await self._hitster_start_or_advance()
+            await self._classic_start_or_advance()
 
-    async def _hitster_start_or_advance(self) -> None:
+    async def _classic_start_or_advance(self) -> None:
         if self.state == "lobby":
-            await self._hitster_start_game()
-        elif self.state == "hitster_reveal":
+            await self._classic_start_game()
+        elif self.state == "classic_reveal":
             if self._podium_complete():
                 # stale client clicked "next turn" — end gracefully instead
                 await self._finish_game()
                 return
-            await self._hitster_advance_turn()
+            await self._classic_advance_turn()
         else:
             raise RoomError(f"cannot start a turn in state {self.state}")
 
@@ -1373,7 +1373,7 @@ class Room:
             )
         )
 
-    async def _hitster_start_game(self) -> None:
+    async def _classic_start_game(self) -> None:
         n_players = len(self.players)
         if n_players < 1:
             raise RoomError("need at least one player")
@@ -1426,7 +1426,7 @@ class Room:
         )
 
         await self._broadcast(
-            HitsterGameStarted(
+            ClassicGameStarted(
                 turn_order=list(self.turn_order),
                 hands={pid: list(cards) for pid, cards in self.hands.items()},
             )
@@ -1442,11 +1442,11 @@ class Room:
         self.current_track_added_by_id = added_by_id
         self.current_track_added_by_name = added_by_name
         self.last_placement_result = None
-        self.state = "hitster_intro"
+        self.state = "classic_intro"
 
         first_player = self.turn_order[0]
         log.info(
-            "room %s hitster game started; intro -> turn 1: %s, song %s — %s (%d)",
+            "room %s classic game started; intro -> turn 1: %s, song %s — %s (%d)",
             self.code,
             first_player,
             track.title,
@@ -1455,22 +1455,22 @@ class Room:
         )
         # the intro phase delays the snippet so all clients can run the
         # "who-goes-first" animation in lockstep
-        self._intro_task = asyncio.create_task(self._hitster_intro_phase())
+        self._intro_task = asyncio.create_task(self._classic_intro_phase())
 
-    async def _hitster_intro_phase(self) -> None:
+    async def _classic_intro_phase(self) -> None:
         try:
-            await asyncio.sleep(HITSTER_INTRO_DURATION_S)
+            await asyncio.sleep(CLASSIC_INTRO_DURATION_S)
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_intro":
+        if self.state != "classic_intro":
             return
         track = self.current_track
         if track is None:
             return
         first_player = self.turn_order[self.turn_index]
-        self.state = "hitster_listening"
+        self.state = "classic_listening"
         await self._broadcast(
-            HitsterTurnChanged(
+            ClassicTurnChanged(
                 current_turn_player_id=first_player,
                 preview_url=track.preview_url,
                 snippet_duration_s=self.snippet_duration_s,
@@ -1478,7 +1478,7 @@ class Room:
         )
         self._snippet_task = asyncio.create_task(self._snippet_phase())
 
-    async def _hitster_advance_turn(self) -> None:
+    async def _classic_advance_turn(self) -> None:
         # finished players keep watching but no longer get turns; offline
         # (disconnected) players are skipped until they reconnect
         finished = set(self.finished_players)
@@ -1511,10 +1511,10 @@ class Room:
         self.current_track_added_by_id = added_by_id
         self.current_track_added_by_name = added_by_name
         self.last_placement_result = None
-        self.state = "hitster_listening"
+        self.state = "classic_listening"
 
         await self._broadcast(
-            HitsterTurnChanged(
+            ClassicTurnChanged(
                 current_turn_player_id=self.turn_order[self.turn_index],
                 preview_url=track.preview_url,
                 snippet_duration_s=self.snippet_duration_s,
@@ -1527,9 +1527,9 @@ class Room:
             await asyncio.sleep(self.snippet_duration_s)
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_listening":
+        if self.state != "classic_listening":
             return
-        self.state = "hitster_placing"
+        self.state = "classic_placing"
         active = self.current_turn_player_id
         # a bot "thinks" for a short beat then places itself; a human gets the
         # full guess window and a client-sent placement
@@ -1548,9 +1548,9 @@ class Room:
             await asyncio.sleep(self.placing_seconds)
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_placing":
+        if self.state != "classic_placing":
             return
-        await self._hitster_reveal(slot_index=None)
+        await self._classic_reveal(slot_index=None)
 
     def _bot_slot(self, bot_id: str) -> int:
         """Where the bot places the current card. It knows the true year, so
@@ -1588,12 +1588,12 @@ class Room:
             await asyncio.sleep(delay)
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_placing":
+        if self.state != "classic_placing":
             return
         active = self.current_turn_player_id
         if active is None or not self._is_bot(active):
             return
-        await self._hitster_reveal(slot_index=self._bot_slot(active))
+        await self._classic_reveal(slot_index=self._bot_slot(active))
 
     async def _force_resolve_active_turn(self) -> None:
         """Reveal the current turn as a miss from either listening or placing.
@@ -1603,14 +1603,14 @@ class Room:
         others waiting out the snippet + placing timeout.
         """
         self._cancel_timers()
-        if self.state == "hitster_listening":
-            # _hitster_reveal only proceeds from "placing"; step into it first
-            self.state = "hitster_placing"
+        if self.state == "classic_listening":
+            # _classic_reveal only proceeds from "placing"; step into it first
+            self.state = "classic_placing"
             self._placing_deadline_ms = None
-        await self._hitster_reveal(slot_index=None)
+        await self._classic_reveal(slot_index=None)
 
     async def place_song(self, player_id: str, slot_index: int) -> None:
-        if self.state != "hitster_placing":
+        if self.state != "classic_placing":
             raise RoomError(f"cannot place in state {self.state}")
         if player_id != self.current_turn_player_id:
             raise RoomError("not your turn")
@@ -1619,7 +1619,7 @@ class Room:
             raise RoomError("invalid slot")
         if self._placing_task is not None:
             self._placing_task.cancel()
-        await self._hitster_reveal(slot_index=slot_index)
+        await self._classic_reveal(slot_index=slot_index)
 
     def _placement_correct(
         self, player_id: str, slot_index: int | None, year: int
@@ -1662,8 +1662,8 @@ class Room:
             and self.has_player(pid)
         ]
 
-    async def _hitster_reveal(self, slot_index: int | None) -> None:
-        if self.state != "hitster_placing":
+    async def _classic_reveal(self, slot_index: int | None) -> None:
+        if self.state != "classic_placing":
             return
         track = self.current_track
         placer_id = self.current_turn_player_id
@@ -1696,7 +1696,7 @@ class Room:
         await self._finalize_reveal(steal_offered=False)
 
     async def _open_steal(self) -> None:
-        self.state = "hitster_stealing"
+        self.state = "classic_stealing"
         self._steal_attempted = set()
         deadline_ms = int((time.time() + self.steal_seconds) * 1000)
         self._steal_deadline_ms = deadline_ms
@@ -1726,7 +1726,7 @@ class Room:
             await asyncio.sleep(random.uniform(0.8, upper))
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_stealing" or self._steal_winner_id is not None:
+        if self.state != "classic_stealing" or self._steal_winner_id is not None:
             return
         if bot_id in self._steal_attempted or bot_id not in self._steal_eligible_ids():
             return
@@ -1740,12 +1740,12 @@ class Room:
             await asyncio.sleep(self.steal_seconds)
         except asyncio.CancelledError:
             return
-        if self.state != "hitster_stealing":
+        if self.state != "classic_stealing":
             return
         await self._finalize_reveal(steal_offered=True)
 
     async def steal_place(self, player_id: str, slot_index: int) -> None:
-        if self.state != "hitster_stealing":
+        if self.state != "classic_stealing":
             raise RoomError(f"cannot steal in state {self.state}")
         if player_id not in self._steal_eligible_ids():
             raise RoomError("you can't steal this turn")
@@ -1809,7 +1809,7 @@ class Room:
             stealer_finished_place=self._steal_finished_place,
         )
         self.last_placement_result = result
-        self.state = "hitster_reveal"
+        self.state = "classic_reveal"
         self._placing_deadline_ms = None
         self._steal_deadline_ms = None
         log.info(
@@ -2406,7 +2406,7 @@ class Room:
     async def end_game(self, requester_id: str) -> None:
         if self.host_id != requester_id:
             raise RoomError("only the host can end the game")
-        if self.state != "hitster_reveal":
+        if self.state != "classic_reveal":
             raise RoomError(f"cannot end game in state {self.state}")
         if not self._podium_complete() and self._fresh_pool():
             raise RoomError("podium not decided and tracks remain")

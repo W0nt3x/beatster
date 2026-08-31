@@ -48,7 +48,7 @@ def _no_stats_writes(monkeypatch: pytest.MonkeyPatch) -> None:
 def fast_timers(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(room_module, "SNIPPET_DURATION_S", 0)
     monkeypatch.setattr(room_module, "PLACING_TIMEOUT_S", 60)
-    monkeypatch.setattr(room_module, "HITSTER_INTRO_DURATION_S", 0)
+    monkeypatch.setattr(room_module, "CLASSIC_INTRO_DURATION_S", 0)
 
 
 def _tracks(n: int, start_year: int = 1980) -> list[Track]:
@@ -172,19 +172,19 @@ async def test_lobby_restore_keeps_bots_and_extra_tracks(
 async def _play_to_reveal(
     manager: RoomManager, monkeypatch: pytest.MonkeyPatch
 ) -> tuple[Any, str, str]:
-    """Two players, one correct placement -> room sits in hitster_reveal."""
+    """Two players, one correct placement -> room sits in classic_reveal."""
     _patch_picker(monkeypatch, _tracks(8))
     room = manager.create_room()
     p1 = await room.add_player("Alice", None)
     p2 = await room.add_player("Bob", None)
     await room.start_round(p1.id)
     await asyncio.sleep(0.05)  # intro (0s) + snippet (0s) -> placing
-    assert room.state == "hitster_placing"
+    assert room.state == "classic_placing"
     active = room.current_turn_player_id
     assert active is not None
     # all mystery years exceed the single starting card's year -> slot 1 fits
     await room.place_song(active, 1)
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     return room, p1.id, p2.id
 
 
@@ -197,13 +197,13 @@ async def test_reveal_checkpoint_roundtrip_and_resume(
 ) -> None:
     room, p1_id, p2_id = await _play_to_reveal(manager, monkeypatch)
     with open(_snapshot_path(_rooms_dir, room.code), encoding="utf-8") as f:
-        assert json.load(f)["state"] == "hitster_reveal"
+        assert json.load(f)["state"] == "classic_reveal"
 
     m2 = RoomManager(catalog)  # type: ignore[arg-type]
     assert m2.restore_rooms() == 1
     restored = m2.get(room.code)
     assert restored is not None
-    assert restored.state == "hitster_reveal"
+    assert restored.state == "classic_reveal"
     assert restored.hands == room.hands
     assert restored.turn_order == room.turn_order
     assert restored.played_track_ids == room.played_track_ids
@@ -216,7 +216,7 @@ async def test_reveal_checkpoint_roundtrip_and_resume(
     assert restored.host_id == p1_id
     # the game continues: next turn starts (offline Bob would be skipped)
     await restored.start_round(p1_id)
-    assert restored.state == "hitster_listening"
+    assert restored.state == "classic_listening"
     restored._cancel_timers()
     room._cancel_timers()
     for t in m2._restore_ttls.values():
@@ -237,7 +237,7 @@ async def test_mid_turn_states_keep_previous_checkpoint(
     await room.add_player("Bob", None)
     await room.start_round(p1.id)
     await asyncio.sleep(0.05)
-    assert room.state == "hitster_placing"  # mid-turn, nothing new persisted
+    assert room.state == "classic_placing"  # mid-turn, nothing new persisted
     with open(_snapshot_path(_rooms_dir, room.code), encoding="utf-8") as f:
         assert json.load(f)["state"] == "lobby"
 

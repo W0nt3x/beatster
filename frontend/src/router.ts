@@ -5,7 +5,7 @@ export type Route =
   | { kind: 'room'; code: string }
   | { kind: 'unknown' }
 
-const NAV_EVENT = 'hitster:nav'
+const NAV_EVENT = 'beatster:nav'
 
 function parse(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { kind: 'landing' }

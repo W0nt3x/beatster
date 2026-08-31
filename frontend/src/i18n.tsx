@@ -8,7 +8,7 @@ import {
 
 export type Lang = 'de' | 'en'
 
-const LANG_KEY = 'hitster:lang'
+const LANG_KEY = 'beatster:lang'
 
 const en = {
   // shell

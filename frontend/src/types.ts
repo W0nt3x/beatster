@@ -1,10 +1,10 @@
 export type RoomState =
   | 'lobby'
-  | 'hitster_intro'
-  | 'hitster_listening'
-  | 'hitster_placing'
-  | 'hitster_stealing'
-  | 'hitster_reveal'
+  | 'classic_intro'
+  | 'classic_listening'
+  | 'classic_placing'
+  | 'classic_stealing'
+  | 'classic_reveal'
   | 'bingo_spin'
   | 'bingo_answering'
   | 'bingo_reveal'
@@ -159,8 +159,8 @@ export type ServerMsg =
   | { type: 'steal_enabled_changed'; enabled: boolean }
   | { type: 'steal_started'; placer_id: string; deadline_ms: number }
   | { type: 'steal_attempted'; player_id: string }
-  | { type: 'hitster_game_started'; turn_order: string[]; hands: Record<string, CardSnapshot[]> }
-  | { type: 'hitster_turn_changed'; current_turn_player_id: string; preview_url: string; snippet_duration_s: number }
+  | { type: 'classic_game_started'; turn_order: string[]; hands: Record<string, CardSnapshot[]> }
+  | { type: 'classic_turn_changed'; current_turn_player_id: string; preview_url: string; snippet_duration_s: number }
   | PlacementResultMsg
   | { type: 'game_mode_changed'; mode: GameMode }
   | { type: 'bingo_settings_changed'; categories: string[]; answer_seconds: number }

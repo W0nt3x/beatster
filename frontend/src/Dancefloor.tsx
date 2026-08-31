@@ -152,7 +152,7 @@ export default function Dancefloor({
               style={
                 copied
                   ? undefined
-                  : { animation: 'hitster-wait-pulse 2s ease-in-out infinite' }
+                  : { animation: 'beatster-wait-pulse 2s ease-in-out infinite' }
               }
             >
               {copied ? '✓' : '+'}

@@ -6,7 +6,7 @@ no accounts, no app: players join with a name and a 6-character room code.
 
 Two game modes:
 
-- **Classic** (Hitster-style timeline play): hear a mystery song, place it
+- **Classic** (timeline music guessing game): hear a mystery song, place it
   between the years you've already collected. First to the card target wins.
   With an optional steal race when someone places wrong.
 - **Music Bingo** (simultaneous rounds on 5×5 colour cards): a category wheel
@@ -77,7 +77,7 @@ cd frontend && pnpm install && pnpm build && cd ..
 cd backend && uv sync
 
 # 3. put the bundled catalog cache where the server looks for it
-mkdir -p ~/.cache/hitster && cp ../data/catalog.json ~/.cache/hitster/
+mkdir -p ~/.cache/beatster && cp ../data/catalog.json ~/.cache/beatster/
 
 # 4. run: one process serves API, WebSockets and the built frontend
 BEATSTER_STATIC_DIR=../frontend/dist uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
@@ -120,17 +120,13 @@ for the full annotated list. The short version:
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `BEATSTER_DATA_DIR` | `~/.cache/hitster` | One base dir for all mutable state |
+| `BEATSTER_DATA_DIR` | `~/.cache/beatster` | One base dir for all mutable state |
 | `BEATSTER_CATALOG_CACHE` | `<data dir>/catalog.json` | Pre-built seed catalog |
-| `BEATSTER_DB` | `<data dir>/hitster.db` | SQLite stats/leaderboard DB |
+| `BEATSTER_DB` | `<data dir>/beatster.db` | SQLite stats/leaderboard DB |
 | `BEATSTER_ROOMS_DIR` | `<data dir>/rooms` | Room checkpoint snapshots |
 | `BEATSTER_STATIC_DIR` | *(unset)* | Serve the built frontend from FastAPI |
 | `BEATSTER_OWNER_TOKEN` | *(unset = off)* | Enables `GET /api/owner/summary` |
 | `BEATSTER_MB_CONTACT` | *(unset)* | Contact for the MusicBrainz year-check tool |
-
-(Each variable is also honored under a legacy `HITSTER_*` spelling, and some
-internal identifiers and default paths still use the project's historical
-working name; they're not user-facing.)
 
 ## The song catalog
 
@@ -184,9 +180,9 @@ depending on your jurisdiction, playing preview clips in a public web offering
 may require licenses that neither this project nor Apple's preview API grant
 you. That responsibility is yours.
 
-Not affiliated with, endorsed by, or connected to Apple, Jumbo, or the
-Hitster board game. "Hitster" is a trademark of its owner; this project's
-internal identifiers use the word only historically.
+Beatster is an independent hobby project inspired by physical timeline music
+card games. It is not affiliated with, endorsed by, or connected to Apple or
+any board game publisher.
 
 ## License
 

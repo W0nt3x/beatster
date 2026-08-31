@@ -177,7 +177,7 @@ function RoomConnected({ code, name }: { code: string; name: string }) {
     const shouldPlay = snapshot?.audio_mode !== 'couch' || isHost
     const url = snapshot?.current_preview_url
     const listening =
-      snapshot?.state === 'hitster_listening' ||
+      snapshot?.state === 'classic_listening' ||
       snapshot?.state === 'bingo_answering'
     if (listening && url && shouldPlay) {
       if (audio.src !== url) {
@@ -251,7 +251,7 @@ function RoomConnected({ code, name }: { code: string; name: string }) {
 
         // clear any stale "audio blocked" error on a new turn; actual playback
         // is driven reactively from the snapshot below
-        if (msg.type === 'hitster_turn_changed' || msg.type === 'bingo_answering')
+        if (msg.type === 'classic_turn_changed' || msg.type === 'bingo_answering')
           setError(null)
       }
 
@@ -571,31 +571,31 @@ function RoomConnected({ code, name }: { code: string; name: string }) {
               onAddBot={addBot}
             />
           )}
-          {snapshot.state === 'hitster_intro' && (
-            <HitsterIntro snapshot={snapshot} myId={myId} />
+          {snapshot.state === 'classic_intro' && (
+            <ClassicIntro snapshot={snapshot} myId={myId} />
           )}
-          {snapshot.state === 'hitster_listening' && (
-            <HitsterListening
+          {snapshot.state === 'classic_listening' && (
+            <ClassicListening
               snapshot={snapshot}
               myId={myId}
             />
           )}
-          {snapshot.state === 'hitster_placing' && (
-            <HitsterPlacing
+          {snapshot.state === 'classic_placing' && (
+            <ClassicPlacing
               snapshot={snapshot}
               myId={myId}
               onPlace={placeSong}
             />
           )}
-          {snapshot.state === 'hitster_stealing' && (
-            <HitsterStealing
+          {snapshot.state === 'classic_stealing' && (
+            <ClassicStealing
               snapshot={snapshot}
               myId={myId}
               onSteal={stealPlace}
             />
           )}
-          {snapshot.state === 'hitster_reveal' && snapshot.last_placement_result && (
-            <HitsterReveal
+          {snapshot.state === 'classic_reveal' && snapshot.last_placement_result && (
+            <ClassicReveal
               result={snapshot.last_placement_result}
               snapshot={snapshot}
               isHost={isHost}
@@ -729,7 +729,7 @@ function VolumeControl({
   )
 }
 
-function HitsterIntro({
+function ClassicIntro({
   snapshot,
   myId,
 }: {
@@ -818,7 +818,7 @@ function HitsterIntro({
   )
 }
 
-function HitsterListening({
+function ClassicListening({
   snapshot,
   myId,
 }: {
@@ -876,7 +876,7 @@ function HitsterListening({
   )
 }
 
-function HitsterPlacing({
+function ClassicPlacing({
   snapshot,
   myId,
   onPlace,
@@ -918,7 +918,7 @@ function HitsterPlacing({
   )
 }
 
-function HitsterStealing({
+function ClassicStealing({
   snapshot,
   myId,
   onSteal,
@@ -995,7 +995,7 @@ function HitsterStealing({
   )
 }
 
-function HitsterReveal({
+function ClassicReveal({
   result,
   snapshot,
   isHost,

@@ -128,15 +128,10 @@ async def get_stats() -> dict[str, object]:
 
 
 def _owner_token_ok(token: str) -> bool:
-    """The owner endpoint is enabled by setting BEATSTER_OWNER_TOKEN (legacy
-    alias: HITSTER_OWNER_TOKEN) in the service environment; without it
-    (e.g. local dev) the endpoint stays off. Read per-request, not at import,
-    so tests can setenv/delenv it."""
-    expected = (
-        os.environ.get("BEATSTER_OWNER_TOKEN")
-        or os.environ.get("HITSTER_OWNER_TOKEN")
-        or ""
-    )
+    """The owner endpoint is enabled by setting BEATSTER_OWNER_TOKEN in the
+    service environment; without it (e.g. local dev) the endpoint stays off.
+    Read per-request, not at import, so tests can setenv/delenv it."""
+    expected = os.environ.get("BEATSTER_OWNER_TOKEN") or ""
     return bool(expected) and secrets.compare_digest(token, expected)
 
 
@@ -379,7 +374,7 @@ class _SpaStaticFiles(StaticFiles):
 
 
 # Single-process self-host mode: serve the built frontend straight from
-# FastAPI when HITSTER_STATIC_DIR points at a dist/ dir. Registered after all
+# FastAPI when BEATSTER_STATIC_DIR points at a dist/ dir. Registered after all
 # routes, so /api/* and /ws/* keep winning. Production (nginx serves static)
 # leaves the env unset and this stays off.
 if config.STATIC_DIR and os.path.isdir(config.STATIC_DIR):

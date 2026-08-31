@@ -17,7 +17,7 @@ Three kinds of data, one zero-ops DB file:
   `GET /api/owner/summary` (env `BEATSTER_OWNER_TOKEN`, see main.py).
 
 All record_* functions never raise — a stats hiccup must not break gameplay.
-The DB file lives next to the catalog cache (`hitster.db`); back it up by
+The DB file lives next to the catalog cache (`beatster.db`); back it up by
 copying the file. Env override: BEATSTER_DB (see app/config.py).
 """
 

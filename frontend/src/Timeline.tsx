@@ -1,4 +1,4 @@
-// The core Hitster visuals: a player's year-sorted timeline, the mystery
+// The core Classic-mode visuals: a player's year-sorted timeline, the mystery
 // card and the snippet progress bar. The timeline has TWO layouts:
 // - touch devices (phones/tablets): the HORIZONTAL strip (2026-07-24, like
 //   cards on the physical table) — vertical stacking scrolled forever there.

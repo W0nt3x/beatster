@@ -58,9 +58,9 @@ export async function fetchStats(): Promise<StatsResponse | null> {
   }
 }
 
-const PLAYER_ID_KEY = 'hitster:player_id'
-const NAME_KEY = 'hitster:name'
-const VOLUME_KEY = 'hitster:volume'
+const PLAYER_ID_KEY = 'beatster:player_id'
+const NAME_KEY = 'beatster:name'
+const VOLUME_KEY = 'beatster:volume'
 const DEFAULT_VOLUME = 0.15
 
 export function getStoredVolume(): number {
@@ -90,7 +90,7 @@ export function setStoredName(name: string): void {
   localStorage.setItem(NAME_KEY, name)
 }
 
-const AVATAR_KEY = 'hitster:avatar'
+const AVATAR_KEY = 'beatster:avatar'
 
 export function getStoredAvatar(): string {
   return localStorage.getItem(AVATAR_KEY) ?? ''

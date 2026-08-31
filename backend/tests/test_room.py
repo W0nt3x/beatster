@@ -51,7 +51,7 @@ def _no_community_writes(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(autouse=True)
 def _no_stats_writes(monkeypatch: pytest.MonkeyPatch) -> None:
-    # don't touch the real hitster.db from room tests
+    # don't touch the real stats DB from room tests
     monkeypatch.setattr(room_module, "record_game_result", lambda **_kw: None)
     monkeypatch.setattr(room_module, "record_placement", lambda **_kw: None)
     monkeypatch.setattr(room_module, "record_activity", lambda *_a, **_kw: None)
@@ -63,7 +63,7 @@ def fast_timers(monkeypatch: pytest.MonkeyPatch) -> None:
     # never (cancelled by tests)
     monkeypatch.setattr(room_module, "SNIPPET_DURATION_S", 0)
     monkeypatch.setattr(room_module, "PLACING_TIMEOUT_S", 60)
-    monkeypatch.setattr(room_module, "HITSTER_INTRO_DURATION_S", 0)
+    monkeypatch.setattr(room_module, "CLASSIC_INTRO_DURATION_S", 0)
 
 
 @pytest.fixture
@@ -187,7 +187,7 @@ async def test_only_host_can_start_game(
         await room.start_round(p2.id)
     # host can
     await room.start_round(p1.id)
-    assert room.state == "hitster_intro"
+    assert room.state == "classic_intro"
     room._cancel_timers()
 
 
@@ -520,7 +520,7 @@ async def test_start_enters_intro_then_listening(
     # Keep snippet long so we don't cascade past listening into placing
     monkeypatch.setattr(room_module, "SNIPPET_DURATION_S", 60)
     monkeypatch.setattr(room_module, "PLACING_TIMEOUT_S", 60)
-    monkeypatch.setattr(room_module, "HITSTER_INTRO_DURATION_S", 0)
+    monkeypatch.setattr(room_module, "CLASSIC_INTRO_DURATION_S", 0)
 
     tracks = [
         Track(id=f"t{i}", title=f"T{i}", artist="A", year=1980 + i, preview_url=f"http://t{i}")
@@ -533,7 +533,7 @@ async def test_start_enters_intro_then_listening(
     await room.start_round(p1.id)
 
     # intro fires first
-    assert room.state == "hitster_intro"
+    assert room.state == "classic_intro"
     assert len(room.hands[p1.id]) == 1
     assert len(room.hands[p2.id]) == 1
     assert set(room.turn_order) == {p1.id, p2.id}
@@ -543,14 +543,14 @@ async def test_start_enters_intro_then_listening(
     assert room.current_track.year == 1982
 
     await asyncio.sleep(0.05)  # let intro_task fire
-    assert room.state == "hitster_listening"
+    assert room.state == "classic_listening"
     room._cancel_timers()
 
 
 async def test_intro_duration_holds_snippet(
     room: Room, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(room_module, "HITSTER_INTRO_DURATION_S", 0.05)
+    monkeypatch.setattr(room_module, "CLASSIC_INTRO_DURATION_S", 0.05)
     monkeypatch.setattr(room_module, "SNIPPET_DURATION_S", 60)
     monkeypatch.setattr(room_module, "PLACING_TIMEOUT_S", 60)
 
@@ -564,15 +564,15 @@ async def test_intro_duration_holds_snippet(
     await room.start_round(p1.id)
 
     # immediately after start: in intro
-    assert room.state == "hitster_intro"
+    assert room.state == "classic_intro"
 
     # before intro elapses
     await asyncio.sleep(0.02)
-    assert room.state == "hitster_intro"
+    assert room.state == "classic_intro"
 
     # after intro elapses
     await asyncio.sleep(0.1)
-    assert room.state == "hitster_listening"
+    assert room.state == "classic_listening"
     room._cancel_timers()
 
 
@@ -591,11 +591,11 @@ async def test_correct_placement_grows_hand(
     p2 = await room.add_player("Bob", None)
     await room.start_round(p1.id)
     await asyncio.sleep(0.05)
-    assert room.state == "hitster_placing"
+    assert room.state == "classic_placing"
     assert room.current_turn_player_id == p1.id
 
     await room.place_song(p1.id, 1)  # after 1980
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.correct is True
     assert len(room.hands[p1.id]) == 2
@@ -897,7 +897,7 @@ async def test_pool_exhaustion_allows_early_end_game(
 
     await room.start_round(p1.id)
     await asyncio.sleep(0.05)  # intro -> listening -> placing (timers at 0)
-    assert room.state == "hitster_placing"
+    assert room.state == "classic_placing"
     await room.place_song(p1.id, 0)
 
     result = room.last_placement_result
@@ -1144,7 +1144,7 @@ async def test_active_player_leaving_mid_listening_resolves_turn(
     # The player on the clock leaving mid-snippet must end the turn immediately
     # (as a miss) instead of stalling the table through the snippet + placing
     # timeout. They go offline but the round moves straight to the reveal.
-    monkeypatch.setattr(room_module, "HITSTER_INTRO_DURATION_S", 0)
+    monkeypatch.setattr(room_module, "CLASSIC_INTRO_DURATION_S", 0)
     monkeypatch.setattr(room_module, "SNIPPET_DURATION_S", 60)
     monkeypatch.setattr(room_module, "PLACING_TIMEOUT_S", 60)
     tracks = [
@@ -1158,14 +1158,14 @@ async def test_active_player_leaving_mid_listening_resolves_turn(
     room.steal_enabled = False  # isolate the leave→resolve path from stealing
     await room.start_round(p1.id)
     await asyncio.sleep(0.01)  # let the intro fire → listening
-    assert room.state == "hitster_listening"
+    assert room.state == "classic_listening"
     active = room.current_turn_player_id
     assert active is not None
 
     broadcasts.clear()
     await room.remove_player(active)  # the active player drops mid-snippet
 
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.correct is False
     assert active in room.disconnected  # offline...
@@ -1225,7 +1225,7 @@ async def test_steal_opens_on_miss_and_winner_takes_card(
     assert room.current_turn_player_id == p1.id
 
     await room.place_song(p1.id, 0)  # 1995 before 1980 → wrong → steal opens
-    assert room.state == "hitster_stealing"
+    assert room.state == "classic_stealing"
     assert room._steal_placer_id == p1.id
     assert set(room._steal_eligible_ids()) == {p2.id, p3.id}  # not the misser
 
@@ -1235,14 +1235,14 @@ async def test_steal_opens_on_miss_and_winner_takes_card(
 
     # Bob places wrong (1995 before 1990 → no) → out, race continues
     await room.steal_place(p2.id, 0)
-    assert room.state == "hitster_stealing"
+    assert room.state == "classic_stealing"
     assert p2.id in room._steal_attempted
     with pytest.raises(RoomError, match="already tried"):
         await room.steal_place(p2.id, 1)
 
     # Carla places correctly (1995 after 1970 → slot 1) → steals the card
     await room.steal_place(p3.id, 1)
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     res = room.last_placement_result
     assert res is not None
     assert res.correct is False  # the active player still missed
@@ -1263,10 +1263,10 @@ async def test_steal_all_miss_leaves_card_unclaimed(
     await asyncio.sleep(0.05)
 
     await room.place_song(p1.id, 0)  # wrong → steal opens (only Bob eligible)
-    assert room.state == "hitster_stealing"
+    assert room.state == "classic_stealing"
     await room.steal_place(p2.id, 0)  # 1995 before 1990 → wrong → all out
 
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     res = room.last_placement_result
     assert res is not None
     assert res.steal_offered is True
@@ -1285,9 +1285,9 @@ async def test_steal_times_out_with_no_winner(
     await asyncio.sleep(0.05)
 
     await room.place_song(p1.id, 0)  # wrong → steal opens
-    assert room.state == "hitster_stealing"
+    assert room.state == "classic_stealing"
     await asyncio.sleep(0.12)  # nobody steals → timeout
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.stolen_by is None
 
@@ -1303,7 +1303,7 @@ async def test_steal_disabled_reveals_directly(
     await asyncio.sleep(0.05)
 
     await room.place_song(p1.id, 0)  # wrong, but stealing off → straight reveal
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.steal_offered is False
 
@@ -1493,7 +1493,7 @@ async def test_bot_takes_its_turn(
     p1 = await room.add_player("Alice", None)
     await room.start_round(p1.id)  # Alice (host) starts; the bot goes first
     await asyncio.sleep(0.15)  # intro → snippet → bot places itself
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.placer_id == bot.id
     assert room.last_placement_result.correct is True  # it hit
@@ -1516,9 +1516,9 @@ async def test_bot_steals_a_missed_card(
     await room.start_round(p1.id)
     await asyncio.sleep(0.05)  # → Alice placing
     await room.place_song(p1.id, 0)  # 1995 before 1980 → wrong → steal opens
-    assert room.state == "hitster_stealing"
+    assert room.state == "classic_stealing"
     await asyncio.sleep(0.12)  # bot races in and steals (correct)
-    assert room.state == "hitster_reveal"
+    assert room.state == "classic_reveal"
     assert room.last_placement_result is not None
     assert room.last_placement_result.stolen_by == bot.id
     room._cancel_timers()

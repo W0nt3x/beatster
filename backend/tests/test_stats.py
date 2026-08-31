@@ -192,11 +192,11 @@ def test_owner_summary_aggregates() -> None:
 def test_owner_token_check(monkeypatch: pytest.MonkeyPatch) -> None:
     from app.main import _owner_token_ok
 
-    monkeypatch.delenv("HITSTER_OWNER_TOKEN", raising=False)
+    monkeypatch.delenv("BEATSTER_OWNER_TOKEN", raising=False)
     # no token configured -> endpoint stays off, nothing matches
     assert not _owner_token_ok("")
     assert not _owner_token_ok("anything")
-    monkeypatch.setenv("HITSTER_OWNER_TOKEN", "s3cret")
+    monkeypatch.setenv("BEATSTER_OWNER_TOKEN", "s3cret")
     assert _owner_token_ok("s3cret")
     assert not _owner_token_ok("wrong")
     assert not _owner_token_ok("")

@@ -1,6 +1,6 @@
 """Bingo mode — the pure rules, testable without sockets or timers.
 
-Adapted from the physical Hitster Bingo (2026-07 design decision): instead of
+Adapted from the physical bingo board (2026-07 design decision): instead of
 a fixed board side A/B the host picks 5 categories from a pool (presets map to
 the physical sides; "group or solo?" is deferred until MusicBrainz artist-type
 enrichment exists and is replaced by a second year category). Everyone answers

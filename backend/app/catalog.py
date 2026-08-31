@@ -25,7 +25,7 @@ EXTRA_TRACK_PREFIX = "itunes_"
 # Search, lookup, and the year heuristic must all use the SAME store: a track_id
 # found in one store may have no previewUrl in another, which would fail the add.
 EXTRA_SONG_STORE = "DE"
-# Paths live in app.config (one HITSTER_DATA_DIR knob + individual overrides);
+# Paths live in app.config (one BEATSTER_DATA_DIR knob + individual overrides);
 # imported as module globals so tests can keep monkeypatching them here.
 CACHE_PATH = _config.CATALOG_CACHE_PATH
 COMMUNITY_PATH = _config.COMMUNITY_PATH

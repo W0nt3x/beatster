@@ -4,11 +4,11 @@ from pydantic import BaseModel, Field
 
 RoomState = Literal[
     "lobby",
-    "hitster_intro",
-    "hitster_listening",
-    "hitster_placing",
-    "hitster_stealing",
-    "hitster_reveal",
+    "classic_intro",
+    "classic_listening",
+    "classic_placing",
+    "classic_stealing",
+    "classic_reveal",
     "bingo_spin",
     "bingo_answering",
     "bingo_reveal",
@@ -329,7 +329,7 @@ class RoomSnapshot(BaseModel):
     last_placement_result: PlacementResult | None = None
     current_preview_url: str | None = None
     placing_deadline_ms: int | None = None
-    # steal phase (only set while state == "hitster_stealing")
+    # steal phase (only set while state == "classic_stealing")
     steal_placer_id: str | None = None  # who missed
     steal_deadline_ms: int | None = None
     steal_attempted: list[str] = []  # stealers already out (placed wrong)
@@ -522,14 +522,14 @@ class BingoRoundDone(BaseModel):
     winners: list[str]
 
 
-class HitsterGameStarted(BaseModel):
-    type: Literal["hitster_game_started"] = "hitster_game_started"
+class ClassicGameStarted(BaseModel):
+    type: Literal["classic_game_started"] = "classic_game_started"
     turn_order: list[str]
     hands: dict[str, list[CardSnapshot]]
 
 
-class HitsterTurnChanged(BaseModel):
-    type: Literal["hitster_turn_changed"] = "hitster_turn_changed"
+class ClassicTurnChanged(BaseModel):
+    type: Literal["classic_turn_changed"] = "classic_turn_changed"
     current_turn_player_id: str
     preview_url: str
     snippet_duration_s: int
