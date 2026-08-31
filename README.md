@@ -162,8 +162,8 @@ reason: several players typing at once must not get your IP blocked.
 ## Nice to know
 
 - **Custom avatars:** drop `avatar-*.png` files into `frontend/src/avatars/`
-  and they appear in the avatar picker. Meme faces of your friend group
-  recommended.
+  and they appear in the avatar picker. Use images you have the rights to
+  (for photos of people, that includes their consent).
 - The catalog leans German/international (it was curated for a German friend
   group), so fork the seed lists to match your crowd; that's the point.
 
@@ -189,4 +189,3 @@ any board game publisher.
 [MIT](LICENSE)
 
 Developed with ♥ by [Wontex](https://github.com/W0nt3x) (Headless Ape Studios).
-If Beatster made your game night, you can [buy me a coffee on Ko-fi](https://ko-fi.com/wontex).

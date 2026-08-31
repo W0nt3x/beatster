@@ -123,18 +123,7 @@ export default function Landing() {
           </button>
         </p>
 
-        <p className="text-center text-xs text-muted/70 mt-8">
-          {t.credit}
-          <span className="mx-1.5 select-none" aria-hidden="true">·</span>
-          <a
-            href="https://ko-fi.com/wontex"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-accent transition"
-          >
-            ☕ {t.kofi}
-          </a>
-        </p>
+        <p className="text-center text-xs text-muted/70 mt-8">{t.credit}</p>
       </div>
 
       <HowToPlay open={helpOpen} onClose={() => setHelpOpen(false)} />

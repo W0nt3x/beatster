@@ -14,7 +14,6 @@ const en = {
   // shell
   tagline: 'Listen, guess the year, score points.',
   credit: 'Developed with ♥ by Wontex · Headless Ape Studios',
-  kofi: 'Buy me a coffee',
   pageNotFound: 'Page not found',
   backToLanding: 'Back to landing',
 
@@ -319,7 +318,6 @@ const de: Messages = {
   // shell
   tagline: 'Hören, Jahr raten, Punkte sammeln.',
   credit: 'Mit ♥ entwickelt von Wontex · Headless Ape Studios',
-  kofi: 'Spendier mir einen Kaffee',
   pageNotFound: 'Seite nicht gefunden',
   backToLanding: 'Zur Startseite',
 
