@@ -122,6 +122,8 @@ export default function Landing() {
             🏆 {t.leaderboard}
           </button>
         </p>
+
+        <p className="text-center text-xs text-muted/70 mt-8">{t.credit}</p>
       </div>
 
       <HowToPlay open={helpOpen} onClose={() => setHelpOpen(false)} />

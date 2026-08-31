@@ -13,6 +13,7 @@ const LANG_KEY = 'hitster:lang'
 const en = {
   // shell
   tagline: 'Listen, guess the year, score points.',
+  credit: 'Developed with ♥ by Wontex · Headless Ape Studios',
   pageNotFound: 'Page not found',
   backToLanding: 'Back to landing',
 
@@ -316,6 +317,7 @@ export type Messages = typeof en
 const de: Messages = {
   // shell
   tagline: 'Hören, Jahr raten, Punkte sammeln.',
+  credit: 'Mit ♥ entwickelt von Wontex · Headless Ape Studios',
   pageNotFound: 'Seite nicht gefunden',
   backToLanding: 'Zur Startseite',
 

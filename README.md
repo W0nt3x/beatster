@@ -191,3 +191,5 @@ internal identifiers use the word only historically.
 ## License
 
 [MIT](LICENSE)
+
+Developed with ♥ by [Wontex](https://github.com/W0nt3x) (Headless Ape Studios).
