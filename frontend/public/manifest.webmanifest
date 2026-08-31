@@ -1,0 +1,28 @@
+{
+  "name": "Beatster Online",
+  "short_name": "Beatster",
+  "description": "Hören, Jahr raten, Punkte sammeln.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#17151f",
+  "theme_color": "#17151f",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

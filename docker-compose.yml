@@ -1,0 +1,12 @@
+services:
+  beatster:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # everything mutable lives here: catalog cache, community songs,
+      # stats DB, room snapshots — back up this folder and you're done
+      - ./data-live:/data
+    # environment:
+    #   BEATSTER_OWNER_TOKEN: change-me   # enables /api/owner/summary
+    restart: unless-stopped

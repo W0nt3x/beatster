@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.pyright/
+
+# Node
+node_modules/
+dist/
+.vite/
+tsconfig.tsbuildinfo
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Runtime data (docker compose volume + local runs)
+data-live/
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Easter-egg ad images are yours to add (see frontend/src/ads/README.md)
+frontend/src/ads/*.png

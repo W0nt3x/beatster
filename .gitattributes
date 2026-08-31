@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repo; shell scripts and Makefiles must
+# stay LF even on Windows checkouts (they run on Linux hosts / in CI).
+* text=auto
+*.sh text eol=lf
+Makefile text eol=lf
+
+# Binary assets
+*.png binary
+*.woff2 binary
