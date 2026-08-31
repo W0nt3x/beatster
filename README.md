@@ -193,3 +193,4 @@ internal identifiers use the word only historically.
 [MIT](LICENSE)
 
 Developed with ♥ by [Wontex](https://github.com/W0nt3x) (Headless Ape Studios).
+If Beatster made your game night, you can [buy me a coffee on Ko-fi](https://ko-fi.com/wontex).
