@@ -16,6 +16,21 @@ Two game modes:
 
 UI in **German and English** (auto-detected, toggleable). Dark neon-club look.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/lobby.webp" alt="Lobby: room code, dance floor with player avatars, Classic/Bingo mode tiles, settings chips"><br><sub>Lobby: room code, dance floor, mode tiles</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/classic-listening.webp" alt="Classic mode: the mystery snippet plays on Ada's turn, her timeline below"><br><sub>Classic: the mystery snippet plays</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/classic-placing.webp" alt="Classic mode: place the song before or after 1981 in your timeline"><br><sub>Classic: place it in your timeline</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/bingo-spin.webp" alt="Bingo mode: the disco ball spins the category wheel"><br><sub>Bingo: the category wheel</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/bingo-answering.webp" alt="Bingo mode: everyone types a year at once, own 5x5 card below"><br><sub>Bingo: everyone answers at once</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/bingo-reveal.webp" alt="Bingo mode: reveal with everyone's answers, then mark a matching cell on your card"><br><sub>Bingo: reveal, then mark a cell</sub></td>
+  </tr>
+</table>
+
 ## Features
 
 - Realtime multiplayer over WebSockets, server-authoritative: no client ever

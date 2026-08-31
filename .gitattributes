@@ -7,3 +7,4 @@ Makefile text eol=lf
 # Binary assets
 *.png binary
 *.woff2 binary
+*.webp binary
