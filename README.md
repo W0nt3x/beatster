@@ -188,4 +188,14 @@ any board game publisher.
 
 [MIT](LICENSE)
 
+Player avatars are rendered with [DiceBear](https://www.dicebear.com) (MIT).
+The avatar artwork has its own licenses:
+
+- "Fun Emoji Set" by [Davis Uche](https://www.instagram.com/davedirect3/)
+  ([source](https://www.figma.com/community/file/968125295144990435)),
+  adapted by DiceBear, licensed under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- "Bottts" by [Pablo Stanley](https://bottts.com/), free for personal and
+  commercial use.
+
 Developed with ♥ by [Wontex](https://github.com/W0nt3x) (Headless Ape Studios).
