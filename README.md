@@ -93,14 +93,18 @@ players can reach the server:
 
 - **Same room, same Wi-Fi:** run it on your PC (Docker or manual, see above)
   and friends open `http://<your-LAN-IP>:8000` on their phones. Docker
-  publishes port 8000 on all interfaces, nothing else to set up.
+  publishes port 8000 on all interfaces, nothing else to set up. Switch the
+  room to **couch mode** (host-only sound) so the music comes from the one
+  device on the TV or speaker instead of six phones at once.
 - **Friends elsewhere (Discord night):** the server has to be reachable from
   the internet. The clean way is a small VPS or cloud box with a domain and
   a reverse proxy (Caddy or nginx) in front of port 8000 that terminates
   HTTPS and forwards WebSockets. The quick-and-dirty way is port forwarding
   on your home router to the PC running it: works, but exposes your home
   IP, stays plain HTTP unless you add a proxy, and rides on your upload
-  bandwidth.
+  bandwidth. Leave the room in **online mode** so every device plays the
+  snippet, or stay in couch mode and share the host's audio in your voice
+  channel.
 - HTTPS is not strictly required (the game runs fine over plain HTTP on a
   LAN), but the PWA "add to home screen" install needs it and browsers warn
   on plain-HTTP pages, so a shared internet link should have it.
